@@ -30,10 +30,11 @@ console.log('örnek görev:', ilkiniDon(['as','sa'],function(metin){return metin
   Aşağıdaki skor1 ve skor2 kodlarını inceleyiniz ve aşağıdaki soruları altına not alarak cevaplayın
   
   1. skor1 ve skor2 arasındaki fark nedir?
-  
+  // Skor1 her çağırıldığında skorArtirici fonksiyonunun içindeki skor değeri 0'a sıfırlanacak. Bu yüzden her seferinde 1 sonucunu verecek. Skor2de ise let skor değeri fonksiyonun dışında tanımlandığı için skor2 fonksiyonu her çalıştığında skor 1 artacak. İlk 1 yanıtını verir, 2,3,4,5... diye devam eder
   2. Hangisi bir closure kullanmaktadır? Nasıl tarif edebilirsin? (yarınki derste öğreneceksin :) )
-  
+  //İkincisi. skor2 değerini skoru güncellemeden güncelleyebiliyoruz
   3. Hangi durumda skor1 tercih edilebilir? Hangi durumda skor2 daha mantıklıdır?
+  //bir variable'a dışarıdan da erişebilmek için skor2 yi kullanırız. Skor değerini bozmadan fonksiyon içinde skoru değiştirebilmek için skor2. 
 */
 
 // skor1 kodları
@@ -64,11 +65,12 @@ Aşağıdaki takimSkoru() fonksiyonununda aşağıdakileri yapınız:
 Not: Bu fonskiyon, aşağıdaki diğer görevler için de bir callback fonksiyonu olarak da kullanılacak
 */
 
-function takimSkoru(/*Kodunuzu buraya yazınız*/){
-    /*Kodunuzu buraya yazınız*/
+
+function takimSkoru(){
+   let randomSayi = Math.round(Math.random()*(25-10 +1) +10);
+   return randomSayi;
 }
-
-
+console.log(takimSkoru());
 
 
 /* Görev 3: macSonucu() 
@@ -86,10 +88,21 @@ Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
 }
 */ 
 
-function macSonucu(/*Kodunuzu buraya yazınız*/){
-  /*Kodunuzu buraya yazınız*/
+function macSonucu(callback, ceyrek){
+    let toplamSkor = {
+      "EvSahibi": 0,
+      "KonukTakim" : 0,
+    }
+    for (let i=1 ; i<=ceyrek; i++){
+      let evSahibiSkor = callback();
+      let konukTakimSkor = callback();
+      toplamSkor["EvSahibi"] += evSahibiSkor;
+      toplamSkor["KonukTakim"] += konukTakimSkor;
+    }
+    return toplamSkor;
+  
 }
-
+console.log(macSonucu(takimSkoru,4));
 
 
 
@@ -109,11 +122,16 @@ Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
   */
 
 
-function periyotSkoru(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
-
+function periyotSkoru(callback) {
+  let ceyrekSkorlari = {
+    "EvSahibi": 0,
+    "KonukTakim" : 0,
+  }
+  ceyrekSkorlari["EvSahibi"] = callback();
+  ceyrekSkorlari["KonukTakim"] = callback()
+  return ceyrekSkorlari;
 }
-
+console.log(periyotSkoru(takimSkoru));
 
 /* Zorlayıcı Görev 5: skorTabelasi() 
 Aşağıdaki skorTabelasi() fonksiyonunu kullanarak aşağıdakileri yapınız:
@@ -146,10 +164,31 @@ MAÇ UZAR ise skorTabelasi(periyotSkoru,takimSkoru,4)
 ] */
 // NOTE: Bununla ilgili bir test yoktur. Eğer logladığınız sonuçlar yukarıdakine benziyor ise tmamlandı sayabilirsiniz.
 
-function skorTabelasi(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
+function skorTabelasi(periyotSkoruCallback, takimSkoruCallback, ceyrek) {
+  let skorlar = [];
+  let evSahibiToplamSkor = 0;
+  let konukTakimToplamSkor = 0;
+  for ( let i = 1; i<=ceyrek;i++){
+    let ceyrekSkor = periyotSkoruCallback(takimSkoruCallback);
+    evSahibiToplamSkor += ceyrekSkor["EvSahibi"];
+    konukTakimToplamSkor += ceyrekSkor["KonukTakim"];
+    skorlar.push(`${i}. Periyot: Ev Sahibi ${ceyrekSkor["EvSahibi"]} - Konuk Takım ${ceyrekSkor["KonukTakim"]}`)
+  }
+  if (evSahibiToplamSkor === konukTakimToplamSkor){
+    let uzatmaNo = 1;
+    while(evSahibiToplamSkor=== konukTakimToplamSkor){
+      let uzatmaSkor = periyotSkoruCallback(takimSkoruCallback);
+      evSahibiToplamSkor += uzatmaSkor["EvSahibi"];
+      konukTakimToplamSkor += uzatmaSkor["KonukTakim"];
+      skorlar.push(`Uzatma ${uzatmaNo}: Ev Sahibi ${uzatmaSkor["EvSahibi"]} - Konuk Takım ${uzatmaSkor["KonukTakim"]}`);
+      uzatmaNo++;
+    }
+  }
+  skorlar.push(`Maç Sonucu: Ev Sahibi ${evSahibiToplamSkor} - Konuk Takım ${konukTakimToplamSkor}`);
+  return skorlar;
 }
 
+console.log(skorTabelasi(periyotSkoru,takimSkoru,4));
 
 
 
